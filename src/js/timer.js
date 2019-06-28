@@ -1,67 +1,83 @@
-// Создай плагин настраиваемого таймера, который ведет обратный отсчет до предварительно определенной даты. 
-// Такой плагин может использоваться в блогах и интернет-магазинах, страницах регистрации событий, 
+// Создай плагин настраиваемого таймера, который ведет обратный отсчет до предварительно определенной даты.
+// Такой плагин может использоваться в блогах и интернет-магазинах, страницах регистрации событий,
 // во время технического обслуживания и т. д.
 
-// Плагин ожидает следующую HTML-разметку и показывает четыре цифры: дни, часы, 
-// минуты и секунды в формате XX:XX:XX:XX. Количество дней может состоять из более чем двух цифр.
-const refs = {
-  field: document.querySelector('.field'),
-  value: document.querySelector('.value'),
-  label: document.querySelector('.label')
-}
+class CountdownTimer {
+  constructor({ selector, targetDate }) {
+    this.selector = selector;
+    this.targetDate = targetDate;
+    this.refs = {
+      daysSpan: document.querySelector('span[data-value="days"]'),
+      hoursSpan: document.querySelector('span[data-value="hours"]'),
+      minutesSpan: document.querySelector('span[data-value="mins"]'),
+      secondsSpan: document.querySelector('span[data-value="secs"]'),
+    };
 
+    this.startTimer = function() {
+      const remainingTime =
+        Date.parse(this.targetDate) - Date.parse(new Date());
+      const convertedRemainingData = this.convertTimeStandartValues(
+        remainingTime,
+      );
+      this.updateFrontRepresentation(convertedRemainingData);
+    };
 
-const timer = {
-  start() {
-    const startTime = Date.now();
-    console.log(startTime);
+    this.convertTimeStandartValues = function(remainingTimeInMilliseconds) {
+      const secs = Math.floor(
+        (remainingTimeInMilliseconds % (1000 * 60)) / 1000,
+      );
+      const mins = Math.floor(
+        (remainingTimeInMilliseconds % (1000 * 60 * 60)) / (1000 * 60),
+      );
+      const hours = Math.floor(
+        (remainingTimeInMilliseconds % (1000 * 60 * 60 * 24)) /
+          (1000 * 60 * 60),
+      );
+      const days = Math.floor(
+        remainingTimeInMilliseconds / (1000 * 60 * 60 * 24),
+      );
+      return {
+        remainingTime: remainingTimeInMilliseconds,
+        days: days,
+        hours: hours,
+        minutes: mins,
+        seconds: secs,
+      };
+    };
 
-    this.timerID = setInterval(() => {
-      const currentTime = Date.now();
+    this.updateFrontRepresentation = function(convertRemainingTimeData) {
+      let tmpRamainingDataObj = convertRemainingTimeData;
+      let intervalId = setInterval(() => {
+        (this.refs.daysSpan.innerHTML = tmpRamainingDataObj.days),
+          (this.refs.hoursSpan.innerHTML = tmpRamainingDataObj.hours),
+          (this.refs.minutesSpan.innerHTML = tmpRamainingDataObj.minutes),
+          (this.refs.secondsSpan.innerHTML = tmpRamainingDataObj.seconds);
 
-      const deltaTime = currentTime - startTime;
-      const date = new Date(deltaTime)
-      console.log(date);
+        tmpRamainingDataObj = this.convertTimeStandartValues(
+          tmpRamainingDataObj.remainingTime - 1000,
+        );
 
-      const hours = date.getUTCHours();
-      const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
-    }, 1000);
+        if (tmpRamainingDataObj.remainingTime < 0) {
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    };
+
+    this.pad = function(value) {
+      return String(value).padStart(2, '0');
+    };
   }
 }
 
-// timer.start();
-
-// Плагин это класс CountdownTimer, экземпляр которого создает новый таймер с настройками.
-// class CountdownTimer {
-    
-// }
-
-
-// new CountdownTimer({
+// Comment: new Date(year, month, date, hours, minutes, seconds, ms)
+// let timer01 = new CountdownTimer({
 //   selector: '#timer-1',
-//   targetDate: new Date('Jul 17, 2019'),
+//   targetDate: new Date(2019, 5, 28, 15, 55, 40, 0),
 // });
-// Для подсчета значений используй следующие готовые формулы, 
-// где time - разница между targetDate и текущей датой.
-// /*
-//  * Оставшиеся дни: делим значение UTC на 1000 * 60 * 60 * 24, количество
-//  * миллисекунд в одном дне (миллисекунды * секунды * минуты * часы)
-//  */
-const days = Math.floor(time / (1000 * 60 * 60 * 24));
-// /*
-//  * Оставшиеся часы: получаем остаток от предыдущего расчета с помощью оператора
-//  * остатка % и делим его на количество миллисекунд в одном часе
-//  * (1000 * 60 * 60 = миллисекунды * минуты * секунды)
-//  */
-const hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-// /*
-//  * Оставшиеся минуты: получаем оставшиеся минуты и делим их на количество
-//  * миллисекунд в одной минуте (1000 * 60 = миллисекунды * секунды)
-//  */
-const mins = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-// /*
-//  * Оставшиеся секунды: получаем оставшиеся секунды и делим их на количество
-//  * миллисекунд в одной секунде (1000)
-//  */
-const secs = Math.floor((time % (1000 * 60)) / 1000);
+
+let timer01 = new CountdownTimer({
+  selector: '#timer-1',
+  targetDate: new Date('Jul 28, 2019'),
+});
+
+timer01.startTimer();
