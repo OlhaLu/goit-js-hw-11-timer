@@ -48,10 +48,10 @@ class CountdownTimer {
     this.updateFrontRepresentation = function(convertRemainingTimeData) {
       let tmpRamainingDataObj = convertRemainingTimeData;
       let intervalId = setInterval(() => {
-        (this.refs.daysSpan.innerHTML = tmpRamainingDataObj.days),
-          (this.refs.hoursSpan.innerHTML = tmpRamainingDataObj.hours),
-          (this.refs.minutesSpan.innerHTML = tmpRamainingDataObj.minutes),
-          (this.refs.secondsSpan.innerHTML = tmpRamainingDataObj.seconds);
+        (this.refs.daysSpan.innerHTML = this.pad(tmpRamainingDataObj.days)),
+          (this.refs.hoursSpan.innerHTML = this.pad(tmpRamainingDataObj.hours)),
+          (this.refs.minutesSpan.innerHTML = this.pad(tmpRamainingDataObj.minutes)),
+          (this.refs.secondsSpan.innerHTML = this.pad(tmpRamainingDataObj.seconds));
 
         tmpRamainingDataObj = this.convertTimeStandartValues(
           tmpRamainingDataObj.remainingTime - 1000,
